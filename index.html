@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07110c">
+<title>Connection Insights PRO 3.0</title>
+<style>
+:root{--bg:#07110c;--panel:#101d15;--panel2:#14271b;--line:#294b35;--green:#39f58b;--muted:#a0b8a8;--text:#effff4;--amber:#ffd166;--red:#ff7887}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#10271a,var(--bg) 55%);color:var(--text);font:15px Arial,sans-serif;padding:16px}
+main{max-width:1100px;margin:auto}header,.card{background:rgba(16,29,21,.96);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 16px}
+header{text-align:center;padding:30px 18px}.eyebrow{color:var(--green);letter-spacing:3px;font-size:11px;font-weight:bold}h1{font-size:clamp(24px,5vw,36px);margin:10px 0}h1 span,h2{color:var(--green)}.sub,.hint{color:var(--muted);line-height:1.55;font-size:13px}.badge{display:inline-block;border:1px solid var(--green);border-radius:30px;padding:7px 12px;color:var(--green);font-size:11px;margin-top:12px}
+h2{font-size:16px;margin:0 0 16px;letter-spacing:1px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{margin-bottom:13px}label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
+input,select,textarea{width:100%;background:#08130c;border:1px solid var(--line);border-radius:9px;padding:12px;color:var(--text);font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--green)}textarea{min-height:85px;resize:vertical}
+button{border:0;border-radius:9px;padding:12px 15px;font-weight:bold;cursor:pointer;background:var(--green);color:#06140b}button.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--green)}button.danger{background:#391820;color:#ffb4bd;border:1px solid #71313c}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px}.actions button{flex:0 1 auto}
+.notice{border:1px solid #6c5926;background:#211d10;color:#ffe4a1;border-radius:10px;padding:13px;font-size:12px;line-height:1.55;margin-top:13px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:#0a160e;border:1px solid var(--line);border-radius:12px;padding:15px;text-align:center}.metric b{display:block;color:var(--green);font-size:25px;margin-bottom:5px}.metric span{font-size:11px;color:var(--muted)}
+.result{background:#09150d;border:1px solid var(--line);border-radius:11px;padding:15px;line-height:1.65;font-size:13px}.result strong{color:var(--green)}
+.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:700px;font-size:12px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--green);text-transform:uppercase;font-size:10px}td{overflow-wrap:anywhere}.pill{display:inline-block;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:bold}.like{color:var(--green);background:#123523}.comment{color:var(--amber);background:#382e13}.empty{text-align:center;color:var(--muted);padding:22px}
+canvas{width:100%;height:230px;display:block;background:#08130c;border:1px solid var(--line);border-radius:10px}.legend{font-size:11px;color:var(--muted);display:flex;gap:15px;flex-wrap:wrap;margin-top:10px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+footer{text-align:center;color:#769181;font-size:11px;padding:18px}
+@media(max-width:650px){body{padding:9px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:15px}.actions button{flex:1}}
+@media print{body{background:white;color:#111}.card,header{background:white;border:1px solid #aaa;color:#111}.hint,.sub{color:#444}button,.notice{display:none}h2,strong{color:#075b2e}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div class="eyebrow">PUBLIC INTERACTION ANALYTICS</div>
+ <h1>CONNECTION <span>INSIGHTS PRO</span></h1>
+ <p class="sub">Comparação organizada de interações públicas registradas — com histórico, comentários, links, métricas e relatório.</p>
+ <span class="badge">VERSÃO 3.0 • REGISTRO TRANSPARENTE</span>
+</header>
+
+<section class="card">
+ <h2>01 / PERFIS PARA COMPARAÇÃO</h2>
+ <div class="grid">
+  <div class="field"><label for="profileA">PERFIL 01</label><input id="profileA" placeholder="@perfil_01" maxlength="80"></div>
+  <div class="field"><label for="profileB">PERFIL 02</label><input id="profileB" placeholder="@perfil_02" maxlength="80"></div>
+ </div>
+ <div class="actions"><button onclick="saveProfiles()">SALVAR PERFIS</button><button class="secondary" onclick="compare()">COMPARAR REGISTROS</button></div>
+ <div class="notice"><b>Limite técnico:</b> inserir dois @ não libera acesso ao histórico de curtidas, comentários ou Direct de outras contas. Este site não faz scraping nem login no Instagram. A comparação usa apenas registros públicos que você inserir ou dados que os titulares tenham exportado e fornecido legitimamente.</div>
+</section>
+
+<section class="card">
+ <h2>02 / REGISTRAR INTERAÇÃO OBSERVADA</h2>
+ <div class="grid">
+  <div class="field"><label for="actor">QUEM INTERAGIU?</label><select id="actor"><option value="A">Perfil 01</option><option value="B">Perfil 02</option></select></div>
+  <div class="field"><label for="kind">TIPO DE INTERAÇÃO</label><select id="kind" onchange="toggleComment()"><option value="like">Curtida observada</option><option value="comment">Comentário público</option></select></div>
+  <div class="field"><label for="owner">PUBLICAÇÃO DE QUAL PERFIL?</label><select id="owner"><option value="B">Perfil 02</option><option value="A">Perfil 01</option></select></div>
+  <div class="field"><label for="media">TIPO DE CONTEÚDO</label><select id="media"><option>Reels</option><option>Foto</option><option>Vídeo</option><option>Carrossel</option><option>Outro</option></select></div>
+  <div class="field"><label for="when">DATA OBSERVADA</label><input id="when" type="date"></div>
+  <div class="field"><label for="url">LINK DA PUBLICAÇÃO (OPCIONAL)</label><input id="url" type="url" placeholder="https://www.instagram.com/p/..."></div>
+ </div>
+ <div class="field" id="commentWrap" hidden><label for="commentText">TEXTO DO COMENTÁRIO PÚBLICO</label><textarea id="commentText" maxlength="2000" placeholder="Registre o texto visível do comentário"></textarea></div>
+ <div class="field"><label for="notes">OBSERVAÇÃO / CONTEXTO (OPCIONAL)</label><textarea id="notes" maxlength="1000" placeholder="Ex.: comentário visível na publicação; data em que foi observado."></textarea></div>
+ <button onclick="addRecord()">+ ADICIONAR AO HISTÓRICO</button>
+ <p class="hint">Registre somente o que você consegue visualizar legitimamente. Não inclua conversas privadas, dados sensíveis ou informações obtidas por acesso não autorizado.</p>
+</section>
+
+<section class="metrics">
+ <div class="metric"><b id="mTotal">0</b><span>REGISTROS</span></div>
+ <div class="metric"><b id="mLikes">0</b><span>CURTIDAS</span></div>
+ <div class="metric"><b id="mComments">0</b><span>COMENTÁRIOS</span></div>
+ <div class="metric"><b id="mDays">0</b><span>DIAS OBSERVADOS</span></div>
+</section>
+
+<section class="card">
+ <h2>03 / COMPARAÇÃO E RECIPROCIDADE</h2>
+ <div class="result" id="comparison">Adicione perfis e registros para gerar a comparação.</div>
+ <p class="hint">A reciprocidade representa somente o equilíbrio numérico dos registros em cada direção. Não mede amizade, intenção, intimidade ou conversa privada. Ausência de registro também não prova ausência de interação.</p>
+</section>
+
+<section class="card">
+ <h2>04 / ATIVIDADE AO LONGO DO TEMPO</h2>
+ <canvas id="chart" width="900" height="260" aria-label="Gráfico de registros nos últimos 14 dias"></canvas>
+ <div class="legend"><span><i class="dot" style="background:#39f58b"></i>Perfil 01 → Perfil 02</span><span><i class="dot" style="background:#ffd166"></i>Perfil 02 → Perfil 01</span></div>
+ <p class="hint">O gráfico considera os últimos 14 dias, com base nas datas cadastradas.</p>
+</section>
+
+<section class="card">
+ <h2>05 / HISTÓRICO DETALHADO</h2>
+ <div class="grid">
+  <div class="field"><label for="filterKind">TIPO</label><select id="filterKind" onchange="renderHistory()"><option value="all">Todos</option><option value="like">Curtidas</option><option value="comment">Comentários</option></select></div>
+  <div class="field"><label for="filterDirection">DIREÇÃO</label><select id="filterDirection" onchange="renderHistory()"><option value="all">Todas</option><option value="A">Perfil 01 → Perfil 02</option><option value="B">Perfil 02 → Perfil 01</option></select></div>
+ </div>
+ <div class="tablewrap"><table><thead><tr><th>Data</th><th>Quem interagiu</th><th>Publicação de</th><th>Tipo</th><th>Conteúdo / comentário</th><th>Link</th><th>Ação</th></tr></thead><tbody id="rows"></tbody></table></div>
+ <div class="empty" id="noRows">Nenhum registro encontrado.</div>
+</section>
+
+<section class="card">
+ <h2>06 / RELATÓRIO</h2>
+ <div class="result" id="report">O relatório será atualizado conforme os registros forem adicionados.</div>
+ <div class="actions"><button onclick="downloadReport()">BAIXAR RELATÓRIO TXT</button><button class="secondary" onclick="exportBackup()">EXPORTAR BACKUP JSON</button><button class="secondary" onclick="window.print()">IMPRIMIR</button></div>
+</section>
+
+<section class="card">
+ <h2>07 / BACKUP E PRIVACIDADE</h2>
+ <div class="actions"><button class="secondary" onclick="document.getElementById('backupFile').click()">IMPORTAR BACKUP JSON</button><button class="danger" onclick="eraseAll()">APAGAR TODOS OS DADOS</button><input hidden id="backupFile" type="file" accept=".json,application/json" onchange="importBackup(event)"></div>
+ <p class="hint">Os dados ficam no armazenamento local deste navegador/dispositivo. Eles não são sincronizados automaticamente entre aparelhos. Exporte um backup para preservar o histórico. Evite registrar dados pessoais de terceiros que não sejam necessários.</p>
+</section>
+<footer>CONNECTION INSIGHTS PRO • ANÁLISE DE REGISTROS PÚBLICOS • SEM ACESSO A MENSAGENS PRIVADAS</footer>
+</main>
+<script>
+const KEY="connection_insights_pro_v3";
+let profiles={A:"@perfil_01",B:"@perfil_02"}, records=[];
+const $=id=>document.getElementById(id);
+const clean=s=>{s=String(s||"").trim();return s?(s.startsWith("@")?s:"@"+s):""};
+const name=k=>profiles[k]||("Perfil "+k);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=d=>{if(!d)return "—";const [y,m,day]=d.split("-");return `${day}/${m}/${y}`};
+function persist(){localStorage.setItem(KEY,JSON.stringify({profiles,records}));}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||"{}");if(x.profiles)profiles=x.profiles;if(Array.isArray(x.records))records=x.records;}catch(e){console.warn("Não foi possível ler os dados locais",e)}$("profileA").value=profiles.A;$("profileB").value=profiles.B;$("when").value=new Date().toLocaleDateString("en-CA");render();}
+function saveProfiles(){profiles.A=clean($("profileA").value)||"@perfil_01";profiles.B=clean($("profileB").value)||"@perfil_02";$("profileA").value=profiles.A;$("profileB").value=profiles.B;persist();render();alert("Perfis salvos.");}
+function toggleComment(){$("commentWrap").hidden=$("kind").value!=="comment";}
+function addRecord(){
+ const actor=$("actor").value,owner=$("owner").value,kind=$("kind").value,date=$("when").value,url=$("url").value.trim(),comment=$("commentText").value.trim();
+ if(actor===owner){alert("Quem interagiu precisa ser diferente do perfil dono da publicação.");return;}
+ if(!date){alert("Informe a data observada.");return;}
+ if(kind==="comment"&&!comment){alert("Informe o texto do comentário público.");return;}
+ if(url){try{const u=new URL(url);if(!["http:","https:"].includes(u.protocol))throw 0;}catch(e){alert("Link inválido. Use um endereço HTTP ou HTTPS.");return;}}
+ records.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),actor,owner,kind,date,media:$("media").value,url,comment:kind==="comment"?comment:"",notes:$("notes").value.trim()});
+ persist();$("url").value="";$("commentText").value="";$("notes").value="";render();alert("Registro adicionado ao histórico.");
+}
+function directions(){return {ab:records.filter(r=>r.actor==="A"&&r.owner==="B").length,ba:records.filter(r=>r.actor==="B"&&r.owner==="A").length};}
+function compare(){
+ const {ab,ba}=directions(),total=ab+ba;
+ const pct=total?Math.round(Math.min(ab,ba)/Math.max(ab,ba)*100):0;
+ const likes=records.filter(r=>r.kind==="like").length,comments=records.filter(r=>r.kind==="comment").length;
+ let label=total?"Distribuição desigual":"Sem registros";
+ if(total&&pct>=80)label="Distribuição equilibrada";
+ else if(total&&pct>=40)label="Distribuição parcialmente equilibrada";
+ $("comparison").innerHTML=`<strong>${esc(name("A"))} → ${esc(name("B"))}:</strong> ${ab} registro(s)<br><strong>${esc(name("B"))} → ${esc(name("A"))}:</strong> ${ba} registro(s)<br><br><strong>Índice de equilíbrio:</strong> ${pct}%<br><strong>Leitura dos registros:</strong> ${label}<br><br><strong>Tipos:</strong> ${likes} curtida(s) e ${comments} comentário(s).<br><strong>Interpretação:</strong> ${total?"Há interações públicas registradas nos dados inseridos.":"Ainda não há interações cadastradas."} Esses números não demonstram conversas privadas nem relacionamento.`;
+}
+function render(){
+ const likes=records.filter(r=>r.kind==="like").length,comments=records.filter(r=>r.kind==="comment").length;
+ $("mTotal").textContent=records.length;$("mLikes").textContent=likes;$("mComments").textContent=comments;$("mDays").textContent=new Set(records.map(r=>r.date)).size;
+ compare();renderHistory();drawChart();makeReport();
+}
+function renderHistory(){
+ const kind=$("filterKind").value,dir=$("filterDirection").value;
+ let list=records.slice().sort((a,b)=>b.date.localeCompare(a.date));
+ if(kind!=="all")list=list.filter(r=>r.kind===kind);if(dir!=="all")list=list.filter(r=>r.actor===dir);
+ $("rows").innerHTML=list.map(r=>`<tr><td>${fmt(r.date)}</td><td>${esc(name(r.actor))}</td><td>${esc(name(r.owner))}</td><td><span class="pill ${r.kind}">${r.kind==="like"?"CURTIDA":"COMENTÁRIO"}</span></td><td>${r.kind==="comment"?esc(r.comment):"Curtida registrada"}<br><small>${esc(r.media)}${r.notes?" • "+esc(r.notes):""}</small></td><td>${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Abrir publicação</a>`:"—"}</td><td><button class="danger" onclick="removeRecord('${esc(r.id)}')">Excluir</button></td></tr>`).join("");
+ $("noRows").style.display=list.length?"none":"block";
+}
+function removeRecord(id){if(!confirm("Excluir este registro?"))return;records=records.filter(r=>r.id!==id);persist();render();}
+function drawChart(){
+ const c=$("chart"),ctx=c.getContext("2d"),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+ const dates=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dates.push(d.toLocaleDateString("en-CA"));}
+ const a=dates.map(d=>records.filter(r=>r.date===d&&r.actor==="A"&&r.owner==="B").length),b=dates.map(d=>records.filter(r=>r.date===d&&r.actor==="B"&&r.owner==="A").length);
+ const max=Math.max(1,...a,...b),L=42,R=w-18,T=18,B=h-38;
+ ctx.strokeStyle="#294b35";ctx.fillStyle="#a0b8a8";ctx.font="12px Arial";
+ for(let i=0;i<=4;i++){const y=T+(B-T)*i/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();ctx.fillText(String(Math.round(max*(4-i)/4)),8,y+4);}
+ function line(vals,color){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();vals.forEach((v,i)=>{const x=L+(R-L)*i/13,y=B-(v/max)*(B-T);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();vals.forEach((v,i)=>{const x=L+(R-L)*i/13,y=B-(v/max)*(B-T);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();});}
+ line(a,"#39f58b");line(b,"#ffd166");ctx.fillStyle="#a0b8a8";[0,3,6,9,13].forEach(i=>ctx.fillText(dates[i].slice(5),L+(R-L)*i/13-14,h-12));
+}
+function makeReport(){
+ const {ab,ba}=directions(),likes=records.filter(r=>r.kind==="like").length,comments=records.filter(r=>r.kind==="comment").length;
+ const sorted=records.map(r=>r.date).sort(),period=sorted.length?fmt(sorted[0])+" a "+fmt(sorted[sorted.length-1]):"Sem período";
+ $("report").innerHTML=`<strong>PERFIS:</strong> ${esc(name("A"))} e ${esc(name("B"))}<br><strong>Período dos registros:</strong> ${period}<br><strong>Total:</strong> ${records.length} • <strong>Curtidas:</strong> ${likes} • <strong>Comentários:</strong> ${comments}<br><strong>${esc(name("A"))} → ${esc(name("B"))}:</strong> ${ab}<br><strong>${esc(name("B"))} → ${esc(name("A"))}:</strong> ${ba}<br><br><strong>Conclusão descritiva:</strong> ${records.length?"O histórico contém "+records.length+" interação(ões) pública(s) cadastrada(s).":"Não existem registros suficientes."}<br><strong>Limitação:</strong> análise restrita aos dados registrados; não confirma Direct, conversa, intenção ou relacionamento.`;
+}
+function download(name_,data,type){const blob=new Blob([data],{type}),u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name_;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function exportBackup(){download("connection-insights-backup.json",JSON.stringify({profiles,records},null,2),"application/json");}
+function downloadReport(){const lines=["CONNECTION INSIGHTS PRO 3.0","Relatório de interações públicas","Perfis: "+name("A")+" | "+name("B"),"Total: "+records.length,"Curtidas: "+records.filter(r=>r.kind==="like").length,"Comentários: "+records.filter(r=>r.kind==="comment").length,""];records.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{lines.push(`${fmt(r.date)} | ${name(r.actor)} -> ${name(r.owner)} | ${r.kind} | ${r.media}`);if(r.comment)lines.push("Comentário: "+r.comment);if(r.url)lines.push("Link: "+r.url);if(r.notes)lines.push("Observação: "+r.notes);lines.push("");});lines.push("Os dados não comprovam conversas privadas ou relacionamento.");download("relatorio-connection-insights.txt",lines.join("\n"),"text/plain;charset=utf-8");}
+function importBackup(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(!x.profiles||!Array.isArray(x.records))throw 0;const ok=x.records.every(r=>r&&["A","B"].includes(r.actor)&&["A","B"].includes(r.owner)&&r.actor!==r.owner&&["like","comment"].includes(r.kind)&&typeof r.date==="string");if(!ok)throw 0;profiles=x.profiles;records=x.records;persist();$("profileA").value=profiles.A;$("profileB").value=profiles.B;render();alert("Backup importado.");}catch(err){alert("Arquivo inválido ou incompatível.");}e.target.value="";};reader.readAsText(f);}
+function eraseAll(){if(!confirm("Apagar todos os perfis e registros salvos neste navegador?"))return;profiles={A:"@perfil_01",B:"@perfil_02"};records=[];persist();$("profileA").value=profiles.A;$("profileB").value=profiles.B;render();}
+window.addEventListener("resize",drawChart);load();
+</script>
+</body>
+</html>
